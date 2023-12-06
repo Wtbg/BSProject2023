@@ -23,5 +23,4 @@ func Foo(c echo.Context) error {
 		Foo: c.QueryParam("foo"),
 		Bar: 42,
 	})
-
 }

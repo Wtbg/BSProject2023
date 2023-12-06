@@ -11,9 +11,19 @@ var DB *gorm.DB
 
 func Init() {
 	connectDatabase()
-	err := DB.AutoMigrate(&Foo{}) // TODO: add table structs here
+	//multiple auto migrate and error handling
+	var err error
+	err = DB.AutoMigrate(&User{})
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Panic(err)
+	}
+	err = DB.AutoMigrate(&Device{})
+	if err != nil {
+		logrus.Panic(err)
+	}
+	err = DB.AutoMigrate(&DeviceMessage{})
+	if err != nil {
+		logrus.Panic(err)
 	}
 }
 
@@ -30,6 +40,9 @@ func connectDatabase() {
 		"@(localhost)/" + loginInfo["db_name"] + "?charset=utf8mb4&parseTime=True&loc=Local"
 	var err error
 	DB, err = gorm.Open(mysql.Open(dbArgs), &gorm.Config{})
+	sqlDB, err := DB.DB()
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
 	if err != nil {
 		logrus.Panic(err)
 	}
