@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"go-svc-tpl/app/response"
 	"go-svc-tpl/model"
 	"gorm.io/gorm"
 	"net/http"
@@ -17,6 +18,15 @@ type jwtCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+// @tags Login
+// @summary Login
+// @router /user/login [post]
+// @produce json
+// @param method formData string true "login method"
+// @param username formData string false "username"
+// @param email formData string false "email"
+// @param password formData string true "password"
+// @response 200 {object} response.Body
 func Login(c echo.Context) error {
 	method := c.FormValue("method")
 	password := c.FormValue("password")
@@ -54,8 +64,20 @@ func Login(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	//set cookie
+	cookie := new(http.Cookie)
+	cookie.Name = "jwt"
+	cookie.Value = t
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	c.SetCookie(cookie)
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"token": t,
-	})
+	return c.JSON(http.StatusOK,
+		response.Body{
+			Code: response.OK,
+			Msg:  "login success",
+			Result: map[string]interface{}{
+				"token": t,
+			},
+		},
+	)
 }

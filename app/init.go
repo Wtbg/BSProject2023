@@ -13,7 +13,6 @@ func InitWebFramework() {
 	e.HideBanner = true
 	addRoutes()
 	e.Validator = &utils.CustomValidator{}
-
 	logrus.Info("echo framework initialized")
 }
 
